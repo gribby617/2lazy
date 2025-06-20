@@ -18,27 +18,8 @@ var typingUsers = {}; // Track typing status per room
 // Express app setup
 var app = express();
 
-// Serve static files from frontend directory
-app.use(express.static(path.join(__dirname, 'frontend')));
-
-// Serve index.html for all routes (SPA support)
-app.get('*', (req, res) => {
-    // Security check to prevent directory traversal
-    if (req.url.includes('..')) {
-        return res.status(403).send('Forbidden');
-    }
-    
-    const filePath = path.join(__dirname, 'frontend', req.url);
-    
-    // Check if the requested file exists
-    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-        // Serve the specific file
-        res.sendFile(filePath);
-    } else {
-        // Serve index.html for SPA routing
-        res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-    }
-});
+// Serve everything from frontend directory
+app.use('/', express.static('frontend'));
 
 // Create HTTP server
 var server = require("http").createServer(app);
