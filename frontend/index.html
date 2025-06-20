@@ -112,6 +112,49 @@ font-size:12px;
 			</div>
 		</div>
 
+		<div id="page_blessed" class="page" style="display:none">
+			<div id="blessed_cont" class="message_cont">
+				<img src="./img/ban/logo.png"><br>
+				<br>
+				<h1>You've been blessed!</h1><br>
+				<br>
+				<b>Message: </b><span id="blessed_message"></span><br>
+				<b>Character Limit: </b><span id="blessed_char_limit"></span><br>
+				<br>
+				You now have VIP status with higher character limits and voteban access!<br>
+				<br>
+				<button onclick="$('#page_blessed').hide()" style="padding:10px 20px;background:#FFA500;border:none;color:black;border-radius:5px;cursor:pointer;">Continue</button>
+			</div>
+		</div>
+
+		<div id="page_voteban" class="page" style="display:none">
+			<div id="voteban_cont" class="message_cont">
+				<img src="./img/ban/logo.png"><br>
+				<br>
+				<h1>Voteban in Progress</h1><br>
+				<br>
+				<p><strong id="voteban_initiator"></strong> has initiated a voteban against <strong id="voteban_target"></strong></p>
+				<p>Votes needed: <strong id="voteban_required"></strong></p>
+				<p>Time remaining: <span id="voteban_timer">30</span> seconds</p>
+				<div id="voteban_votes">Current votes: 0</div>
+				<br>
+				<button id="voteban_vote_btn" style="margin:10px;padding:10px 20px;background:#4CAF50;border:none;color:white;border-radius:5px;cursor:pointer;">Vote to Ban</button>
+				<button onclick="$('#page_voteban').hide()" style="margin:10px;padding:10px 20px;background:#666;border:none;color:white;border-radius:5px;cursor:pointer;">Close</button>
+			</div>
+		</div>
+
+		<div id="page_voteban_result" class="page" style="display:none">
+			<div id="voteban_result_cont" class="message_cont">
+				<img src="./img/ban/logo.png"><br>
+				<br>
+				<h1>Voteban Result</h1><br>
+				<br>
+				<div id="voteban_result_message"></div>
+				<br>
+				<button onclick="$('#page_voteban_result').hide()" style="padding:10px 20px;background:#666;border:none;color:white;border-radius:5px;cursor:pointer;">Close</button>
+			</div>
+		</div>
+
 		<div id="page_unsupp" class="page" style="display:none">
 			<div id="unsupp_cont" class="message_cont">
 				<img src="./img/error/logo.png"><br>

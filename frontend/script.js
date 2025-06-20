@@ -1,6 +1,8 @@
 "use strict";
 var passcode = "";
 var err = false;
+var currentUserLevel = 0; // Track current user's level
+var currentUserBlessed = false; // Track current user's blessed status
 function updateAds() {
     var a = $(window).height() - $(adElement).height(),
         b = a <= 250;
@@ -121,6 +123,15 @@ function setup() {
         }),
         socket.on("room", function (a) {
             $("#room_owner")[a.isOwner ? "show" : "hide"](), $("#room_public")[a.isPublic ? "show" : "hide"](), $("#room_private")[a.isPublic ? "hide" : "show"](), $(".room_id").text(a.room);
+            // Store the user's level for context menu permissions
+            if (a.userLevel !== undefined) {
+                currentUserLevel = a.userLevel;
+            }
+        }),
+        socket.on("levelUpdate", function (a) {
+            // Update the user's level when it changes
+            currentUserLevel = a.level;
+            console.log("User level updated to:", currentUserLevel);
         }),
         socket.on("updateAll", function (a) {
             $("#page_login").hide(), (usersPublic = a.usersPublic), usersUpdate(), BonziHandler.bonzisCheck();
@@ -228,6 +239,53 @@ function setup() {
                         this.deconstruct(), delete bonzis[a.guid], delete usersPublic[a.guid], usersUpdate();
                     }.bind(b, a)
                 );
+        }),
+        socket.on("blessed", function (a) {
+            // Show blessed notification using proper page structure
+            $("#blessed_message").text(a.message);
+            $("#blessed_char_limit").text(a.charLimit);
+            $("#page_blessed").show();
+            
+            // Update blessed status for context menu
+            currentUserBlessed = true;
+        }),
+        socket.on("votebanStart", function (a) {
+            // Show voteban interface
+            showVotebanInterface(a);
+        }),
+        socket.on("voteCast", function (a) {
+            // Update voteban vote count
+            updateVotebanVotes(a);
+        }),
+        socket.on("votebanResult", function (a) {
+            // Show voteban result
+            showVotebanResult(a);
+        }),
+        socket.on("voteError", function (a) {
+            // Show vote error
+            var errorDiv = $("<div class='vote-error' style='position:fixed;top:20px;right:20px;background:#f44336;color:white;padding:10px;border-radius:5px;z-index:9999;'>" +
+                a.message +
+                "<br><button onclick='$(this).parent().remove()' style='margin-top:5px;padding:3px 8px;background:#d32f2f;border:none;color:white;border-radius:3px;cursor:pointer;'>Close</button>" +
+                "</div>");
+            $("body").append(errorDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(function() {
+                errorDiv.fadeOut(function() { $(this).remove(); });
+            }, 5000);
+        }),
+        socket.on("charLimitError", function (a) {
+            // Show character limit error
+            var errorDiv = $("<div class='char-limit-error' style='position:fixed;top:20px;right:20px;background:#ff9800;color:white;padding:10px;border-radius:5px;z-index:9999;'>" +
+                a.message +
+                "<br><button onclick='$(this).parent().remove()' style='margin-top:5px;padding:3px 8px;background:#f57c00;border:none;color:white;border-radius:3px;cursor:pointer;'>Close</button>" +
+                "</div>");
+            $("body").append(errorDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(function() {
+                errorDiv.fadeOut(function() { $(this).remove(); });
+            }, 5000);
         });
 }
 function usersUpdate() {
@@ -381,51 +439,107 @@ var _createClass = (function () {
                 $.contextMenu({
                     selector: this.selCanvas,
                     build: function (a, b) {
-                        return {
-                            items: {
-                                cancel: {
-                                    name: "Cancel",
-                                    callback: function () {
-                                        d.cancel();
-                                    },
+                        var items = {
+                            cancel: {
+                                name: "Cancel",
+                                callback: function () {
+                                    d.cancel();
                                 },
-                                mute: {
-                                    name: function () {
-                                        return d.mute ? "Unmute" : "Mute";
-                                    },
-                                    callback: function () {
-                                        d.cancel(), (d.mute = !d.mute);
-                                    },
+                            },
+                            mute: {
+                                name: function () {
+                                    return d.mute ? "Unmute" : "Mute";
                                 },
-                                asshole: {
-                                    name: "Call an Asshole",
-                                    callback: function () {
-                                        socket.emit("command", { list: ["asshole", d.userPublic.name] });
-                                    },
+                                callback: function () {
+                                    d.cancel(), (d.mute = !d.mute);
                                 },
-                                owo: {
-                                    name: "Notice Bulge",
-                                    callback: function () {
-                                        socket.emit("command", { list: ["owo", d.userPublic.name] });
-                                    },
+                            },
+                            asshole: {
+                                name: "Call an Asshole",
+                                callback: function () {
+                                    socket.emit("command", { list: ["asshole", d.userPublic.name] });
                                 },
-                                quote: {
-                                    name: "Quote",
-                                    callback: function () {
-                                        socket.emit("command", { list: ["quote"] });
-                                    },
+                            },
+                            owo: {
+                                name: "Notice Bulge",
+                                callback: function () {
+                                    socket.emit("command", { list: ["owo", d.userPublic.name] });
                                 },
-                                dm: {
-                                    name: "DM",
-                                    callback: function () {
-                                        var message = prompt("Enter your message to " + d.userPublic.name.replace(/<[^>]*>/g, "") + ":");
-                                        if (message && message.trim() !== "") {
-                                            socket.emit("command", { list: ["dm", d.userPublic.name.replace(/<[^>]*>/g, "") + " " + message] });
-                                        }
-                                    },
+                            },
+                            quote: {
+                                name: "Quote",
+                                callback: function () {
+                                    socket.emit("command", { list: ["quote"] });
+                                },
+                            },
+                            dm: {
+                                name: "DM",
+                                callback: function () {
+                                    var message = prompt("Enter your message to " + d.userPublic.name.replace(/<[^>]*>/g, "") + ":");
+                                    if (message && message.trim() !== "") {
+                                        socket.emit("command", { list: ["dm", d.userPublic.name.replace(/<[^>]*>/g, "") + " " + message] });
+                                    }
                                 },
                             },
                         };
+                        
+                        // Add king commands only for kings (level 1+) and popes (level 2+)
+                        if (currentUserLevel >= 1) {
+                            items.separator1 = "---------";
+                            items.bless = {
+                                name: "Bless (King/Pope)",
+                                callback: function () {
+                                    socket.emit("command", { list: ["bless", d.userPublic.name.replace(/<[^>]*>/g, "")] });
+                                },
+                            };
+                            items.tempban = {
+                                name: "Temp Ban (King)",
+                                callback: function () {
+                                    var reason = prompt("Enter temp ban reason (10 minutes):", "A king got pissed.");
+                                    if (reason !== null) {
+                                        socket.emit("command", { list: ["tempban", d.userPublic.name.replace(/<[^>]*>/g, "") + " " + reason] });
+                                    }
+                                },
+                            };
+                            items.kick = {
+                                name: "Kick (King)",
+                                callback: function () {
+                                    var reason = prompt("Enter kick reason:", "A king got pissed.");
+                                    if (reason !== null) {
+                                        socket.emit("command", { list: ["kick", d.userPublic.name.replace(/<[^>]*>/g, "") + " " + reason] });
+                                    }
+                                },
+                            };
+                        }
+                        
+                        // Add voteban command for blessed users, kings (level 1+), and popes (level 2+)
+                        if (currentUserBlessed || currentUserLevel >= 1) {
+                            if (!items.separator1) {
+                                items.separator1 = "---------";
+                            }
+                            items.voteban = {
+                                name: "Voteban (Blessed/King/Pope)",
+                                callback: function () {
+                                    socket.emit("command", { list: ["voteban", d.userPublic.name.replace(/<[^>]*>/g, "")] });
+                                },
+                            };
+                        }
+                        
+                        // Add pope commands only for popes (level 2+)
+                        if (currentUserLevel >= 2) {
+                            items.separator2 = "---------";
+                            items.ban = {
+                                name: "Ban (Pope)",
+                                callback: function () {
+                                    var reason = prompt("Enter ban reason:");
+                                    if (reason !== null) {
+                                        socket.emit("command", { list: ["ban", d.userPublic.name.replace(/<[^>]*>/g, "") + " " + reason] });
+                                    }
+                                },
+                            };
+                        }
+                        
+                        return { items: items };
                     },
                     animation: { duration: 175, show: "fadeIn", hide: "fadeOut" },
                 }),
@@ -1081,7 +1195,7 @@ var _createClass = (function () {
                 (this.framerate = 1 / 15),
                 (this.spriteSheets = {}),
                 (this.prepSprites = function () {
-                    for (var a = ["black", "blue", "brown", "green", "purple", "red", "pink", "pope"], b = 0; b < a.length; b++) {
+                    for (var a = ["black", "blue", "brown", "green", "purple", "red", "pink", "pope", "king", "blessed"], b = 0; b < a.length; b++) {
                         var c = a[b],
                             d = { images: ["./img/bonzi/" + c + ".png"], frames: BonziData.sprite.frames, animations: BonziData.sprite.animations };
                         this.spriteSheets[c] = new createjs.SpriteSheet(d);
@@ -1229,3 +1343,67 @@ var typingTimer = null; // Timer for typing stop
 $(window).load(function () {
     document.addEventListener("touchstart", touchHandler, !0), document.addEventListener("touchmove", touchHandler, !0), document.addEventListener("touchend", touchHandler, !0), document.addEventListener("touchcancel", touchHandler, !0);
 });
+
+// Voteban interface functions
+function showVotebanInterface(votebanData) {
+    // Set voteban data in the page
+    $("#voteban_initiator").text(votebanData.initiatorName);
+    $("#voteban_target").text(votebanData.targetUsername);
+    $("#voteban_required").text(votebanData.requiredVotes);
+    $("#voteban_votes").text("Current votes: 0");
+    $("#voteban_timer").text("30");
+    $("#voteban_vote_btn").prop("disabled", false).text("Vote to Ban");
+    
+    // Set up vote button
+    $("#voteban_vote_btn").off("click").on("click", function() {
+        voteOnVoteban(votebanData.votebanId);
+    });
+    
+    // Show the voteban page
+    $("#page_voteban").show();
+    
+    // Start countdown timer
+    var timeLeft = 30;
+    var timer = setInterval(function() {
+        timeLeft--;
+        $("#voteban_timer").text(timeLeft);
+        if(timeLeft <= 0) {
+            clearInterval(timer);
+            $("#page_voteban").hide();
+        }
+    }, 1000);
+}
+
+function updateVotebanVotes(voteData) {
+    if($("#page_voteban").is(":visible")) {
+        $("#voteban_votes").text("Current votes: " + voteData.currentVotes + " / " + voteData.requiredVotes);
+        if(voteData.currentVotes >= voteData.requiredVotes) {
+            $("#voteban_vote_btn").prop("disabled", true).text("Voteban Successful!");
+        }
+    }
+}
+
+function showVotebanResult(resultData) {
+    // Hide voteban interface if it's still open
+    $("#page_voteban").hide();
+    
+    // Set result message
+    var resultMessage = resultData.success ? 
+        resultData.targetUsername + " has been banned for 1 minute! (Everyone thought they were Megaman)" :
+        "Voteban failed. " + resultData.voteCount + "/" + resultData.requiredVotes + " votes received.";
+    
+    $("#voteban_result_message").html(resultMessage);
+    
+    // Show the result page
+    $("#page_voteban_result").show();
+    
+    // Auto-hide after 8 seconds
+    setTimeout(function() {
+        $("#page_voteban_result").hide();
+    }, 8000);
+}
+
+function voteOnVoteban(votebanId) {
+    socket.emit("command", { list: ["vote", votebanId] });
+    $("#voteban_vote_btn").prop("disabled", true).text("Voted!");
+}
