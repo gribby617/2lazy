@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BonziWORLD README</title>
+  <style>
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  font-family: "Tahoma", sans-serif;
+  background-color: #6d33a0;
+}
+
+.xp_bubble, #content {
+  background: #ffffe1;
+  color: #000;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+  border: #000000 solid 1px; }
+
+@font-face {
+  font-family: 'Tahoma';
+  src: url("../font/Tahoma/Tahoma.eot?#iefix") format("embedded-opentype"), url("../font/Tahoma/Tahoma.woff") format("woff"), url("../font/Tahoma/Tahoma.ttf") format("truetype"), url("../font/Tahoma/Tahoma.svg#Tahoma") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
+#content {
+  width: 75%;
+  max-width: 800px;
+  margin: 32px auto;
+  padding: 16px 32px;
+  background-color: rgba(255, 255, 225, 0.8);
+}
+
+#titlebar {
+  background-color: rgba(109, 51, 160, 0.85); }
+
+/*# sourceMappingURL=readme.min.css.map */
+
+  </style>
+	<meta content="">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="mobile-web-app-capable" content="yes" />
+
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+	<link rel="manifest" href="/favicons/manifest.json">
+	<link rel="mask-icon" href="/favicons/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="/favicons/favicon.ico">
+	<meta name="msapplication-config" content="/favicons/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+
+</head>
+<body>
+	<div id="content">
+		<p><img src="./img/readme/logo.png" alt="BonziWORLD logo. I may have taken &quot;inspiration&quot; from WinXP."></p>
+<h6 id="leading-the-industry-in-gorilla-based-chat-clients-">Leading the industry in gorilla-based chat clients.</h6>
+<h1>BonziWORLD Server README</h1>
+    Welcome to BonziWORLD, the most advanced gorilla-based chat client since 2016! This server is a modernized, secure, and feature-rich implementation that doesn't suck like all those other skiddie-owned clusterfucks.<br><br>
+    Default name is Anonymous. we du nut 4 get.
+    
+    <h2>Security Features</h2>
+    Vanilla BonziWORLD rapes itself as soon as someone injects little aids scripts into commands. Here's what this server fixed:
+    <ol>
+      <li>JS/HTML injection (because apparently people can't be trusted)</li>
+      <li>Server crash glitch (no more ragequits)</li>
+      <li>Flooding protection (alt limit to stop those annoying kids)</li>
+      <li>Spamming protection (slowmode because we're not animals)</li>
+      <li>Text filtering (blacklist system for the easily offended)</li>
+    </ol>
+    
+    <h2>Chat Features</h2>
+    <ul>
+      <li><strong>Markdown Support:</strong> Format your messages with **bold**, ~~italics~~, __underline__, --strikethrough--, ^^big text^^, $r$rainbow text$r$, ||spoilers||, and ``code``</li>
+      <li><strong>Context Menu:</strong> Right-click on any Bonzi for quick actions</li>
+      <li><strong>Quote System:</strong> Quote the last message with the context menu</li>
+      <li><strong>Direct Messages:</strong> Send private messages to other users</li>
+      <li><strong>Media Support:</strong> Share images and videos from catbox.moe</li>
+    </ul>
+    
+    <h2>Commands</h2>
+    Here are all the commands you can use. The square brackets indicate parameters, please don't include them!<br><br>
+    
+    <h3>Basic Commands</h3>
+    <ul>
+      <li><code>/name [new name]</code> - Change your name (supports markdown!)</li>
+      <li><code>/color [color]</code> - Change your Bonzi's color (purple, blue, red, green, pink, black, brown)</li>
+      <li><code>/pitch [number]</code> - Change TTS pitch (0-400)</li>
+      <li><code>/speed [number]</code> - Change TTS speed (0-400)</li>
+    </ul>
+    
+    <h3>Fun Commands</h3>
+    <ul>
+      <li><code>/joke</code> - Bonzi tells a joke (warning: they're terrible)</li>
+      <li><code>/fact</code> - Bonzi shares a "fun" fact</li>
+      <li><code>/backflip [swag]</code> - Bonzi does a backflip (add "swag" for extra coolness)</li>
+      <li><code>/asshole [username]</code> - Call someone an asshole (classy)</li>
+      <li><code>/owo [username]</code> - Notice someone's bulge (owo what's this?)</li>
+      <li><code>/triggered</code> - The classic triggered copypasta</li>
+      <li><code>/linux</code> - Richard Stallman would be proud</li>
+      <li><code>/quote</code> - Quote the last message sent</li>
+    </ul>
+    
+    <h3>Media Commands</h3>
+    <ul>
+      <li><code>/image [catbox URL]</code> - Display an image in chat (catbox.moe only)</li>
+      <li><code>/video [catbox URL]</code> - Play a video in chat (catbox.moe only)</li>
+      <li><code>/youtube [video ID]</code> - Play a YouTube video (just paste the URL, we'll figure it out)</li>
+    </ul>
+    
+    <h3>Admin Commands (Level 2)</h3>
+    <ul>
+      <li><code>/godmode [password]</code> - Get admin privileges (check config.json for password)</li>
+      <li><code>/pope</code> - Turn into the Pope (requires godmode)</li>
+      <li><code>/restart</code> - Restart the server (assumes auto-restart is enabled)</li>
+      <li><code>/update</code> - Reload config files without restart</li>
+      <li><code>/sanitize</code> - Toggle text filtering on/off</li>
+    </ul>
+    
+    <h3>Context Menu Actions</h3>
+    Right-click on any Person to access:
+    <ul>
+      <li><strong>Cancel</strong> - Stop whatever that guy is doing</li>
+      <li><strong>Mute/Unmute</strong> - Someone spamming the /linux copypasta? Mute em. </li>
+      <li><strong>Call an Asshole</strong> - Quick way to be rude</li>
+      <li><strong>Notice Bulge</strong> - The classic owo</li>
+      <li><strong>Quote</strong> - Quote the last message</li>
+      <li><strong>DM</strong> - Send a direct message</li>
+    </ul>
+    
+    <h2>Markdown Guide</h2>
+    Make your messages fancy with these formatting options:
+    <ul>
+      <li><code>**bold text**</code> - Makes text bold</li>
+      <li><code>~~italic text~~</code> - Makes text italic</li>
+      <li><code>__underlined text__</code> - Underlines text</li>
+      <li><code>--strikethrough text--</code> - Crosses out text</li>
+      <li><code>^^big text^^</code> - Makes text bigger</li>
+      <li><code>$r$rainbow text$r$</code> - Makes text rainbow colored</li>
+      <li><code>||spoiler text||</code> - Hides text until clicked</li>
+      <li><code>``code text``</code> - Formats as code</li>
+    </ul>
+    
+    <h2>Setup</h2>
+    <ol>
+      <li>Make sure you have Node.js installed (because we're not savages)</li>
+      <li>Run <code>npm install</code> to get the dependencies</li>
+      <li>Edit <code>config/config.json</code> to customize settings</li>
+      <li>Add colors to <code>config/colors.txt</code> (one per line)</li>
+      <li>Add banned words to <code>config/blacklist.txt</code> (one per line)</li>
+      <li>Run <code>node index.js</code> to start the server</li>
+      <li>Profit!</li>
+    </ol>
+    
+    <h2>Configuration</h2>
+    Edit <code>config/config.json</code> to customize:
+    <ul>
+      <li><strong>port</strong> - Server port (default: 80)</li>
+      <li><strong>godword</strong> - Admin password for /godmode</li>
+      <li><strong>altlimit</strong> - Maximum connections per IP</li>
+      <li><strong>slowmode</strong> - Cooldown between messages (ms)</li>
+      <li><strong>namelimit</strong> - Maximum name length</li>
+      <li><strong>charlimit</strong> - Maximum message length</li>
+    </ul>
+    
+    <h2>Known Issues</h2>
+    <ul>
+      <li>Sometimes Bonzi gets stuck in animations (just click him to cancel)</li>
+      <li>TTS might not work in all browsers (blame the browser, not us)</li>
+      <li>Markdown can break if you're too creative (don't be too creative)</li>
+      <li>Pope color might not work if you're not admin (git gud)</li>
+    </ul>
+    
+    <h2>Contributing</h2>
+    Want to make this server even better? Great! Just don't break anything or we'll have to call you names. Fork the repo, make your changes, and submit a pull request. Or don't, we're not your boss.
+    
+    <h2>License</h2>
+    This is open source because we're not greedy capitalists. Do whatever you want with it, just don't blame us if it breaks your computer or your life.
+    
+	</div>
+
+	<div id="titlebar">
+		<div id="minimize"></div>
+		<div id="maximize"></div>
+		<div id="close"></div>
+	</div>
+</body>
+</html>
