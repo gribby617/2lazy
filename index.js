@@ -30,13 +30,23 @@ var io = require("socket.io")(server, {
     allowEIO3: true
 });
 
+// Helper to get real IP from socket (Render, Replit, etc)
+function getRealIP(socket) {
+  const headers = socket.handshake && socket.handshake.headers ? socket.handshake.headers : {};
+  return (
+    headers['x-real-ip'] ||
+    (headers['x-forwarded-for'] ? headers['x-forwarded-for'].split(',')[0].trim() : null) ||
+    socket.request.connection.remoteAddress
+  );
+}
+
 server.listen(config.port, () => {
     rooms["default"] = new room("default");
     console.log("running at http://bonzi.localhost:" + config.port);
 });
 io.on("connection", (socket) => {
   // Check if user is banned
-  var userIP = socket.request.connection.remoteAddress;
+  var userIP = getRealIP(socket);
   if(bannedUsers[userIP] && bannedUsers[userIP].end > Date.now()) {
     // User is still banned
     socket.emit("ban", {
@@ -51,12 +61,12 @@ io.on("connection", (socket) => {
   }
   
   //First, verify this user fits the alt limit
-  if(typeof userips[socket.request.connection.remoteAddress] == 'undefined') userips[socket.request.connection.remoteAddress] = 0;
-  userips[socket.request.connection.remoteAddress]++;
+  if(typeof userips[userIP] == 'undefined') userips[userIP] = 0;
+  userips[userIP]++;
   
-  if(userips[socket.request.connection.remoteAddress] > config.altlimit){
+  if(userips[userIP] > config.altlimit){
     //If we have more than the altlimit, don't accept this connection and decrement the counter.
-    userips[socket.request.connection.remoteAddress]--;
+    userips[userIP]--;
     socket.disconnect();
     return;
   }
@@ -201,7 +211,7 @@ var commands = {
     
     // Store ban in bannedUsers
     var banEnd = Date.now() + (10 * 60 * 1000); // 10 minutes
-    bannedUsers[targetUser.socket.request.connection.remoteAddress] = {
+    bannedUsers[getRealIP(targetUser.socket)] = {
       reason: reason,
       end: banEnd
     };
@@ -279,7 +289,7 @@ var commands = {
     
     // Store ban in bannedUsers
     var banEnd = Date.now() + (365 * 24 * 60 * 60 * 1000); // 1 year ban
-    bannedUsers[targetUser.socket.request.connection.remoteAddress] = {
+    bannedUsers[getRealIP(targetUser.socket)] = {
       reason: reason,
       end: banEnd
     };
@@ -399,7 +409,7 @@ var commands = {
           
           // Store ban in bannedUsers
           var banEnd = Date.now() + (60 * 1000); // 1 minute ban
-          bannedUsers[voteban.target.socket.request.connection.remoteAddress] = {
+          bannedUsers[getRealIP(voteban.target.socket)] = {
             reason: "Everyone thought you were Megaman",
             end: banEnd
           };
@@ -484,7 +494,7 @@ var commands = {
       
       // Store ban in bannedUsers
       var banEnd = Date.now() + (60 * 1000); // 1 minute ban
-      bannedUsers[voteban.target.socket.request.connection.remoteAddress] = {
+      bannedUsers[getRealIP(voteban.target.socket)] = {
         reason: "Everyone thought you were Megaman",
         end: banEnd
       };
@@ -757,8 +767,8 @@ class user {
 
       //Deconstruct the user on disconnect
         this.socket.on("disconnect", () => {
-          userips[this.socket.request.connection.remoteAddress]--;
-          if(userips[this.socket.request.connection.remoteAddress] == 0) delete userips[this.socket.request.connection.remoteAddress];
+          userips[getRealIP(this.socket)]--;
+          if(userips[getRealIP(this.socket)] == 0) delete userips[getRealIP(this.socket)];
                                                                   
           
 
