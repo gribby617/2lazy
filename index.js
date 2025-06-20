@@ -1,5 +1,6 @@
-var http = require("http");
+var express = require("express");
 var fs = require("fs");
+var path = require("path");
 
 //Read settings
 var colors = fs.readFileSync("./config/colors.txt").toString().replace(/\r/,"").split("\n");
@@ -13,25 +14,40 @@ var userips = {}; //It's just for the alt limit
 var guidcounter = 0;
 var lastMessage = { text: "", user: "" }; // Track last message for quoting
 var typingUsers = {}; // Track typing status per room
-var server = http.createServer((req, res) => {
-    //HTTP SERVER (not getting express i won't use 99% of its functions for a simple project)
-    fname = "index.html";
-    if (fs.existsSync("./frontend/" + req.url) && fs.lstatSync("./frontend/" + req.url).isFile()) {
-        data = fs.readFileSync("./frontend/" + req.url);
-        fname = req.url;
-    } else {
-        data = fs.readFileSync("./frontend/index.html");
+
+// Express app setup
+var app = express();
+
+// Serve static files from frontend directory
+app.use(express.static(path.join(__dirname, 'frontend')));
+
+// Serve index.html for all routes (SPA support)
+app.get('*', (req, res) => {
+    // Security check to prevent directory traversal
+    if (req.url.includes('..')) {
+        return res.status(403).send('Forbidden');
     }
-    fname.endsWith(".js") ? res.writeHead(200, { "Content-Type": "text/javascript" }) : res.writeHead(200, {});
-    if(!req.url.includes("../")) res.write(data);
-    res.end();
+    
+    const filePath = path.join(__dirname, 'frontend', req.url);
+    
+    // Check if the requested file exists
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        // Serve the specific file
+        res.sendFile(filePath);
+    } else {
+        // Serve index.html for SPA routing
+        res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+    }
 });
+
+// Create HTTP server
+var server = require("http").createServer(app);
 
 //Socket.io Server
 var io = require("socket.io")(server, {
     allowEIO3: true
-}
-);
+});
+
 server.listen(config.port, () => {
     rooms["default"] = new room("default");
     console.log("running at http://bonzi.localhost:" + config.port);
